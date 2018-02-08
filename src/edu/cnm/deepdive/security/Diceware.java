@@ -26,6 +26,8 @@ import java.util.regex.Pattern;
  */
 public class Diceware {
 
+  private static final String NEGATIVE_PASSPHRASE_MESSAGE = "Passphrase length cannot be negative.";
+
   private static final String LINE_PATTERN = "^\\s*(\\d+)\\s+(\\S+)\\s*$";
 
   private List<String> words;
@@ -58,10 +60,10 @@ public class Diceware {
   
   /**
    * Initializes an instance of <code>Diceware</code> using a
-   * {@ link Collection <String>} object as the source list.
-   * @param source
+   * {@link Collection} object as the source list.
+   * @param source      source parameters.
    */
-  public Diceware(Collection<String> source) {
+  public Diceware(Collection source) {
     words = new ArrayList<>(source);
   }
   /**
@@ -92,7 +94,7 @@ public class Diceware {
   }
   /**
    * Setting the parameters for a random number generator. 
-   * @param rng
+   * @param rng     pseudo-random number generator.
    */
   
   public void setRng(Random rng) {
@@ -107,9 +109,17 @@ public class Diceware {
    * @param duplicatesAllowed           true if allowed;false if not
    * @return                            words in passphrase.
    * @throws NoSuchAlgorithmException   if the source of randomness is not available.
+   * @throws InsufficientPoolsException if password length exceeds word list, and duplicates not allowed or word list has no words. 
+   * @throws IllegalArgumentException   if requested length is negative. 
    */
-  public String[] generate(int length, boolean duplicatesAllowed)
-      throws NoSuchAlgorithmException {
+  public String[] generate(int length, boolean duplicatesAllowed) throws NoSuchAlgorithmException, InsufficientPoolException, IllegalArgumentException {
+    if (length < 0) {
+      throw new IllegalArgumentException(NEGATIVE_PASSPHRASE_MESSAGE);
+    }
+    if ((words.size() == 0 && length > 0) 
+        || (!duplicatesAllowed && length > words.size())) {
+      throw new InsufficientPoolException();
+    }
     List<String> passphrase = new LinkedList<>();
     while (passphrase.size() < length) {
       String word = generate();
@@ -121,20 +131,27 @@ public class Diceware {
   }
   /**
    * Generates and returns ( in a <code>String</code>) a password of specified
-   * length.This method invokes {@link number generate(int, boolean)}, specifying 
+   * length.This method invokes {@link number generate}, specifying 
    * that duplicates are allowed.
    * @param length                      number of words from specified password
    * @return                            return true if duplicates are allowed otherwise
    *                                    return false.
    * @throws NoSuchAlgorithmException   if the algorithm is not available this exception will 
    *                                    be displayed.
+   *  @throws InsufficientPoolsException if word list has no words. 
+   *  @throws IllegalArgumentException   if requested length is negative.                                   
+   *                                    
    */
-  public String[] generate(int length) throws NoSuchAlgorithmException {
+  public String[] generate(int length) throws NoSuchAlgorithmException,InsufficientPoolException, IllegalArgumentException {
     return generate(length, true);
   }
   private String generate() throws NoSuchAlgorithmException {
     int index = getRng().nextInt(words.size());
     return words.get(index);
   }
-
+public static class InsufficientPoolException extends IllegalArgumentException {
+  private InsufficientPoolException() {
+    
+  }
+}
 }
