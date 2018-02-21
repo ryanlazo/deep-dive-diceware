@@ -39,9 +39,6 @@ public class Diceware {
    * object. If the <code>File</code> does not exist, or cannot be read, an exception will be
    * thrown.
    * 
-   * @param file file to read for word list.
-   * @throws FileNotFoundException if file does not exist.
-   * @throws IOException if file can't be read.
    */
 
   public Diceware() {
@@ -76,7 +73,7 @@ public class Diceware {
   }
 
   /**
-   * Initializes an instance of <code>Diceware</code> using a {@ link ResourceBundle} object as the
+   * Initializes an instance of <Diceware> using a {@ link ResourceBundle} object as the
    * source list.
    * 
    * @param bundle properties are provided words for word list.
@@ -125,8 +122,6 @@ public class Diceware {
    * @param duplicatesAllowed true if allowed;false if not
    * @return words in passphrase.
    * @throws NoSuchAlgorithmException if the source of randomness is not available.
-   * @throws InsufficientPoolsException if password length exceeds word list, and duplicates not
-   *         allowed or word list has no words.
    * @throws IllegalArgumentException if requested length isn't positive.
    */
   public String[] generate(int length, boolean duplicatesAllowed)
@@ -149,14 +144,11 @@ public class Diceware {
 
   /**
    * Generates and returns ( in a <code>String</code>) a password of specified length.This method
-   * invokes {@link number generate}, specifying that duplicates are allowed.
-   * 
-   * @param length number of words from specified password
    * @return return true if duplicates are allowed otherwise return false.
    * @throws NoSuchAlgorithmException if the algorithm is not available this exception will be
    *         displayed.
-   * @throws InsufficientPoolsException if word list has no words.
    * @throws IllegalArgumentException if requested length is negative.
+   * @throws InsufficientPoolException if requested length is insufficient.
    * 
    */
   public String generate(int length, String delimiter)
